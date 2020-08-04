@@ -116,20 +116,22 @@ def get_main_menu():
 
 
 def process_message(messenger, message):
-    if "attachments" in message["message"]:
-        if message["message"]["attachments"][0]["type"] == "location":
-            logger.debug("Location received")
-            attachments = message["message"]["attachments"]
-            response = Text(
-                text="{}: lat: {}, long: {}".format(
-                    message["message"]["attachments"][0]["title"],
-                    attachments[0]["payload"]["coordinates"]["lat"],
-                    attachments[0]["payload"]["coordinates"]["long"],
-                )
+    if (
+        "attachments" in message["message"]
+        and message["message"]["attachments"][0]["type"] == "location"
+    ):
+        logger.debug("Location received")
+        attachments = message["message"]["attachments"]
+        response = Text(
+            text="{}: lat: {}, long: {}".format(
+                message["message"]["attachments"][0]["title"],
+                attachments[0]["payload"]["coordinates"]["lat"],
+                attachments[0]["payload"]["coordinates"]["long"],
             )
-            res = messenger.send(response.to_dict(), "RESPONSE")
-            logger.debug("Response: {}".format(res))
-            return True
+        )
+        res = messenger.send(response.to_dict(), "RESPONSE")
+        logger.debug("Response: {}".format(res))
+        return True
 
     if (
         "quick_reply" in message["message"]
@@ -365,41 +367,40 @@ def process_postback(messenger, payload):
         messenger.send(res.to_dict(), "RESPONSE")
         return True
 
-    if payload.startswith("GIT_"):
-        if "GIT_1" in payload:
-            messenger.send({"text": _("Good question 👌🏽")}, "RESPONSE")
-            messenger.send_action(typing_on)
-            sleep(3)
+    if payload.startswith("GIT_") and "GIT_1" in payload:
+        messenger.send({"text": _("Good question 👌🏽")}, "RESPONSE")
+        messenger.send_action(typing_on)
+        sleep(3)
 
-            text = _(
-                u"Git is a type of version control system (VCS) that makes"
-                " it easier to track changes to files. "
-            )
-            messenger.send({"text": text}, "RESPONSE")
-            messenger.send_action(typing_on)
-            sleep(3)
+        text = _(
+            u"Git is a type of version control system (VCS) that makes"
+            " it easier to track changes to files. "
+        )
+        messenger.send({"text": text}, "RESPONSE")
+        messenger.send_action(typing_on)
+        sleep(3)
 
-            text = _(
-                u"For example, when you edit a file, Git can help you"
-                " determine exactly what changed, who changed it, and why."
-            )
-            messenger.send({"text": text}, "RESPONSE")
-            messenger.send_action(typing_on)
-            sleep(3)
+        text = _(
+            u"For example, when you edit a file, Git can help you"
+            " determine exactly what changed, who changed it, and why."
+        )
+        messenger.send({"text": text}, "RESPONSE")
+        messenger.send_action(typing_on)
+        sleep(3)
 
-            qr1 = quick_replies.QuickReply(
-                title=_("👶🏽 Install Git"), payload="INSTALL_GIT"
-            )
-            qr2 = quick_replies.QuickReply(
-                title=_("🤓 I've Git Installed"), payload="CONF_GIT"
-            )
-            qrs = quick_replies.QuickReplies(quick_replies=[qr1, qr2])
-            text = {
-                "text": _(u"Want to learn more about Git?"),
-                "quick_replies": qrs.to_dict(),
-            }
-            messenger.send(text, "RESPONSE")
-            return True
+        qr1 = quick_replies.QuickReply(
+            title=_("👶🏽 Install Git"), payload="INSTALL_GIT"
+        )
+        qr2 = quick_replies.QuickReply(
+            title=_("🤓 I've Git Installed"), payload="CONF_GIT"
+        )
+        qrs = quick_replies.QuickReplies(quick_replies=[qr1, qr2])
+        text = {
+            "text": _(u"Want to learn more about Git?"),
+            "quick_replies": qrs.to_dict(),
+        }
+        messenger.send(text, "RESPONSE")
+        return True
 
     ###################################
     # FIRST TIME CONTRIBUTION SECTION #
